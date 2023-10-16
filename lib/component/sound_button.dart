@@ -2,8 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SoundButton extends StatefulWidget {
+// 入力無効状態
+final isAbsorbingProvider = StateProvider<bool>((ref) => false);
+
+class SoundButton extends ConsumerStatefulWidget {
   const SoundButton({
     Key? key,
     required this.soundFilePath,
@@ -11,39 +15,54 @@ class SoundButton extends StatefulWidget {
 
   final String soundFilePath;
 
+  // @override
+  // State<SoundButton> createState() => _SoundButtonState();
   @override
-  State<SoundButton> createState() => _SoundButtonState();
+  _SoundButtonState createState() => _SoundButtonState();
 }
 
-class _SoundButtonState extends State<SoundButton> {
+class _SoundButtonState extends ConsumerState<SoundButton> {
   // 押した時の状態
-  bool _isButtonPressed = false;
+  bool isButtonPressed = false;
   // 時間
-  Timer? _timer;
+  Timer? timer;
   // オーディオ
   final audioPlayer = AudioPlayer();
 
   // 再生時間が長い場合強制的に終了させる用
   void stopTimer() {
     // タイマー開始
-    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
+    timer = Timer.periodic(const Duration(seconds: 3), (_) {
       setState(() {
-        _isButtonPressed = false;
+        isButtonPressed = false;
       });
+      ref.watch(isAbsorbingProvider.notifier).state = false;
       audioPlayer.stop();
-      _timer?.cancel();
+      timer?.cancel();
     });
   }
 
   // 音を鳴らす
   void audioPray() {
     audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
+    ref.read(isAbsorbingProvider.notifier).state = true;
 
-    // 再生終了後、ステータス変更
+    // 再生中はボタン入力無効playing
+    // audioPlayer.onPlayerStateChanged.listen((PlayerState s) => {
+    //       if (s == PlayerState.playing)
+    //         {
+    //           setState(() {
+    //             ref.read(isAbsorbingProvider.notifier).state = true;
+    //           }),
+    //         }
+    //     });
+
+    // // 再生終了後、ステータス変更
     audioPlayer.onPlayerComplete.listen((event) {
       setState(() {
-        _isButtonPressed = false;
+        isButtonPressed = false;
       });
+      ref.read(isAbsorbingProvider.notifier).state = false;
       audioPlayer.stop();
     });
   }
@@ -57,48 +76,55 @@ class _SoundButtonState extends State<SoundButton> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isButtonPressed = true;
-          audioPray();
-          stopTimer();
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(
-          milliseconds: 120,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-              color: _isButtonPressed
-                  ? Colors.grey.shade200
-                  : Colors.grey.shade300),
-          boxShadow: _isButtonPressed
-              ? [
-                  // 押下時は影なし
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.grey.shade500,
-                    offset: const Offset(2, 2),
-                    blurRadius: 7,
-                    spreadRadius: 1,
-                  ),
-                  const BoxShadow(
-                    color: Colors.white,
-                    offset: Offset(-2, -2),
-                    blurRadius: 7,
-                    spreadRadius: 1,
-                  ),
-                ],
-        ),
-        child: Icon(
-          Icons.music_note,
-          size: _isButtonPressed ? 43 : 45,
-          color: _isButtonPressed ? Colors.grey.shade500 : Colors.black,
+    // Riverpodからabsorbingの状態を取得
+    final bool isAbsorbing = ref.read(isAbsorbingProvider.notifier).state;
+
+    return AbsorbPointer(
+      absorbing: isAbsorbing,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            isButtonPressed = true;
+            ref.read(isAbsorbingProvider.notifier).state = true;
+            audioPray();
+            stopTimer();
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(
+            milliseconds: 120,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+                color: isButtonPressed
+                    ? Colors.grey.shade200
+                    : Colors.grey.shade300),
+            boxShadow: isButtonPressed
+                ? [
+                    // 押下時は影なし
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.grey.shade500,
+                      offset: const Offset(2, 2),
+                      blurRadius: 7,
+                      spreadRadius: 1,
+                    ),
+                    const BoxShadow(
+                      color: Colors.white,
+                      offset: Offset(-2, -2),
+                      blurRadius: 7,
+                      spreadRadius: 1,
+                    ),
+                  ],
+          ),
+          child: Icon(
+            Icons.music_note,
+            size: isButtonPressed ? 43 : 45,
+            color: isButtonPressed ? Colors.grey.shade500 : Colors.black,
+          ),
         ),
       ),
     );
