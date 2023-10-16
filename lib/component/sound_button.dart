@@ -15,10 +15,8 @@ class SoundButton extends ConsumerStatefulWidget {
 
   final String soundFilePath;
 
-  // @override
-  // State<SoundButton> createState() => _SoundButtonState();
   @override
-  _SoundButtonState createState() => _SoundButtonState();
+  ConsumerState createState() => _SoundButtonState();
 }
 
 class _SoundButtonState extends ConsumerState<SoundButton> {
@@ -30,13 +28,14 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   final audioPlayer = AudioPlayer();
 
   // 再生時間が長い場合強制的に終了させる用
-  void stopTimer() {
+  void resetAndStartTimer() {
+    timer?.cancel();
     // タイマー開始
     timer = Timer.periodic(const Duration(seconds: 3), (_) {
       setState(() {
         isButtonPressed = false;
       });
-      ref.watch(isAbsorbingProvider.notifier).state = false;
+      ref.read(isAbsorbingProvider.notifier).state = false;
       audioPlayer.stop();
       timer?.cancel();
     });
@@ -45,17 +44,6 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   // 音を鳴らす
   void audioPray() {
     audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
-    ref.read(isAbsorbingProvider.notifier).state = true;
-
-    // 再生中はボタン入力無効playing
-    // audioPlayer.onPlayerStateChanged.listen((PlayerState s) => {
-    //       if (s == PlayerState.playing)
-    //         {
-    //           setState(() {
-    //             ref.read(isAbsorbingProvider.notifier).state = true;
-    //           }),
-    //         }
-    //     });
 
     // // 再生終了後、ステータス変更
     audioPlayer.onPlayerComplete.listen((event) {
@@ -77,7 +65,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   @override
   Widget build(BuildContext context) {
     // Riverpodからabsorbingの状態を取得
-    final bool isAbsorbing = ref.read(isAbsorbingProvider.notifier).state;
+    final bool isAbsorbing = ref.watch(isAbsorbingProvider);
 
     return AbsorbPointer(
       absorbing: isAbsorbing,
@@ -87,7 +75,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
             isButtonPressed = true;
             ref.read(isAbsorbingProvider.notifier).state = true;
             audioPray();
-            stopTimer();
+            resetAndStartTimer();
           });
         },
         child: AnimatedContainer(
