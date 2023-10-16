@@ -31,7 +31,7 @@ class _GamePageState extends State<GamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: const Color(0xFF3736A7),
+        color: Colors.grey.shade300,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(15),
