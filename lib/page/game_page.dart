@@ -10,22 +10,22 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   List<Widget> buttonsList = [
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
-    const SoundButton(),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'cat_meow_1.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
   ];
   @override
   Widget build(BuildContext context) {
@@ -50,6 +50,20 @@ class _GamePageState extends State<GamePage> {
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade600,
+                        offset: const Offset(1, 1),
+                        blurRadius: 3,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.grey.shade300,
+                        offset: const Offset(-1, -1),
+                        blurRadius: 3,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(15),
