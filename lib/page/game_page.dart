@@ -10,22 +10,22 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   List<Widget> buttonsList = [
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'cat_meow_1.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
-    const SoundButton(soundFilePath: 'wolf_howl.mp3'),
+    const SoundButton(soundFilePath: 'cat01.mp3'),
+    const SoundButton(soundFilePath: 'cat02.mp3'),
+    const SoundButton(soundFilePath: 'chicken01.mp3'),
+    const SoundButton(soundFilePath: 'cicada01.mp3'),
+    const SoundButton(soundFilePath: 'cow01.mp3'),
+    const SoundButton(soundFilePath: 'crow01.mp3'),
+    const SoundButton(soundFilePath: 'cuckoo01.mp3'),
+    const SoundButton(soundFilePath: 'dog01.mp3'),
+    const SoundButton(soundFilePath: 'dog02.mp3'),
+    const SoundButton(soundFilePath: 'elephant01.mp3'),
+    const SoundButton(soundFilePath: 'horse01.mp3'),
+    const SoundButton(soundFilePath: 'japanese-nightingale.mp3.mp3'),
+    const SoundButton(soundFilePath: 'lion02.mp3'),
+    const SoundButton(soundFilePath: 'pig01.mp3'),
+    const SoundButton(soundFilePath: 'sheep01.mp3'),
+    const SoundButton(soundFilePath: 'wolf01.mp3'),
   ];
   @override
   Widget build(BuildContext context) {

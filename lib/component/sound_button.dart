@@ -23,14 +23,14 @@ class _SoundButtonState extends State<SoundButton> {
   // オーディオ
   final audioPlayer = AudioPlayer();
 
-  // TODO
-  // 本来は時間ではなく、イベント後に真偽値変更する
-  void startTimer() {
+  // 再生時間が長い場合強制的に終了させる用
+  void stopTimer() {
     // タイマー開始
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
       setState(() {
         _isButtonPressed = false;
       });
+      audioPlayer.stop();
       _timer?.cancel();
     });
   }
@@ -38,6 +38,14 @@ class _SoundButtonState extends State<SoundButton> {
   // 音を鳴らす
   void audioPray() {
     audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
+
+    // 再生終了後、ステータス変更
+    audioPlayer.onPlayerComplete.listen((event) {
+      setState(() {
+        _isButtonPressed = false;
+      });
+      audioPlayer.stop();
+    });
   }
 
   // リソースのクリーンアップ
@@ -54,7 +62,7 @@ class _SoundButtonState extends State<SoundButton> {
         setState(() {
           _isButtonPressed = true;
           audioPray();
-          startTimer();
+          stopTimer();
         });
       },
       child: AnimatedContainer(
