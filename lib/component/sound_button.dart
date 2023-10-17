@@ -42,8 +42,8 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   }
 
   // 音を鳴らす
-  void audioPray() {
-    audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
+  void audioPray() async {
+    await audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
   }
 
   // 初回
@@ -56,6 +56,8 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
             {
               setState(() {
                 ref.read(isAbsorbingProvider.notifier).state = true;
+                debugPrint(
+                    '再生中${ref.read(isAbsorbingProvider.notifier).state}');
               }),
             }
         });
@@ -64,6 +66,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       setState(() {
         isButtonPressed = false;
         ref.read(isAbsorbingProvider.notifier).state = false;
+        debugPrint('再生終了${ref.read(isAbsorbingProvider.notifier).state}');
       });
       audioPlayer.stop();
     });
