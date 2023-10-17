@@ -69,6 +69,7 @@ class _GamePageState extends State<GamePage> {
                     padding: const EdgeInsets.all(15),
                     child: GridView.count(
                       shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       crossAxisCount: 4,
                       crossAxisSpacing: 15,
                       mainAxisSpacing: 15,

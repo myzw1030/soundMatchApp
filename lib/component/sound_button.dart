@@ -35,8 +35,8 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       setState(() {
         isButtonPressed = false;
       });
-      ref.read(isAbsorbingProvider.notifier).state = false;
       audioPlayer.stop();
+      ref.read(isAbsorbingProvider.notifier).state = false;
       timer?.cancel();
     });
   }
@@ -44,13 +44,27 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   // 音を鳴らす
   void audioPray() {
     audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
+  }
 
+  // 初回
+  @override
+  void initState() {
+    super.initState();
+    // 再生中はボタン入力無効playing
+    audioPlayer.onPlayerStateChanged.listen((PlayerState s) => {
+          if (s == PlayerState.playing)
+            {
+              setState(() {
+                ref.read(isAbsorbingProvider.notifier).state = true;
+              }),
+            }
+        });
     // // 再生終了後、ステータス変更
     audioPlayer.onPlayerComplete.listen((event) {
       setState(() {
         isButtonPressed = false;
+        ref.read(isAbsorbingProvider.notifier).state = false;
       });
-      ref.read(isAbsorbingProvider.notifier).state = false;
       audioPlayer.stop();
     });
   }
@@ -64,7 +78,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
 
   @override
   Widget build(BuildContext context) {
-    // Riverpodからabsorbingの状態を取得
+    // absorbingの状態を取得
     final bool isAbsorbing = ref.watch(isAbsorbingProvider);
 
     return AbsorbPointer(
@@ -73,7 +87,6 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         onTap: () {
           setState(() {
             isButtonPressed = true;
-            ref.read(isAbsorbingProvider.notifier).state = true;
             audioPray();
             resetAndStartTimer();
           });
