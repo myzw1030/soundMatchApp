@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sound_match_app/component/question_sound_button.dart';
 import 'package:sound_match_app/component/sound_button.dart';
 
 class GamePage extends StatefulWidget {
@@ -21,12 +22,13 @@ class _GamePageState extends State<GamePage> {
     const SoundButton(soundFilePath: 'dog02.mp3'),
     const SoundButton(soundFilePath: 'elephant01.mp3'),
     const SoundButton(soundFilePath: 'horse01.mp3'),
-    const SoundButton(soundFilePath: 'japanese-nightingale.mp3.mp3'),
+    const SoundButton(soundFilePath: 'japanese-nightingale.mp3'),
     const SoundButton(soundFilePath: 'lion02.mp3'),
     const SoundButton(soundFilePath: 'pig01.mp3'),
     const SoundButton(soundFilePath: 'sheep01.mp3'),
     const SoundButton(soundFilePath: 'wolf01.mp3'),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,21 +80,7 @@ class _GamePageState extends State<GamePage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: () {
-                    print('aa');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(300, 50),
-                    backgroundColor: Colors.grey,
-                  ),
-                  child: const Text(
-                    '出題する',
-                    style: TextStyle(
-                      fontSize: 30,
-                    ),
-                  ),
-                ),
+                QuestionSoundButton(),
               ],
             ),
           ),

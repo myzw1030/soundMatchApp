@@ -18,6 +18,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   audioplayers: ^4.1.0
   flutter_riverpod: ^2.3.7
+  custom_lint: ^0.2.5
 
 dev_dependencies:
   flutter_test:
