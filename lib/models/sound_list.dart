@@ -48,4 +48,11 @@ class SoundsLists {
   String getRandomSound() {
     return soundLists[random.nextInt(soundLists.length)];
   }
+
+  // リストをシャッフルする
+  List<String> shuffleSounds() {
+    List<String> shuffledList = List.from(soundLists);
+    shuffledList.shuffle();
+    return shuffledList;
+  }
 }

@@ -91,8 +91,10 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
           setState(() {
             isButtonPressed = true;
             audioPray();
+            // ref.read(playSoundProvider(widget.soundFilePath));
             resetAndStartTimer();
           });
+          print('押されたのは：${widget.soundFilePath}');
         },
         child: AnimatedContainer(
           duration: const Duration(

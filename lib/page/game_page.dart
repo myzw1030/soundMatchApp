@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sound_match_app/component/question_sound_button.dart';
 import 'package:sound_match_app/component/sound_button.dart';
+import 'package:sound_match_app/models/sound_list.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -10,24 +11,19 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  List<Widget> buttonsList = [
-    const SoundButton(soundFilePath: 'cat01.mp3'),
-    const SoundButton(soundFilePath: 'cat02.mp3'),
-    const SoundButton(soundFilePath: 'chicken01.mp3'),
-    const SoundButton(soundFilePath: 'cicada01.mp3'),
-    const SoundButton(soundFilePath: 'cow01.mp3'),
-    const SoundButton(soundFilePath: 'crow01.mp3'),
-    const SoundButton(soundFilePath: 'cuckoo01.mp3'),
-    const SoundButton(soundFilePath: 'dog01.mp3'),
-    const SoundButton(soundFilePath: 'dog02.mp3'),
-    const SoundButton(soundFilePath: 'elephant01.mp3'),
-    const SoundButton(soundFilePath: 'horse01.mp3'),
-    const SoundButton(soundFilePath: 'japanese-nightingale.mp3'),
-    const SoundButton(soundFilePath: 'lion02.mp3'),
-    const SoundButton(soundFilePath: 'pig01.mp3'),
-    const SoundButton(soundFilePath: 'sheep01.mp3'),
-    const SoundButton(soundFilePath: 'wolf01.mp3'),
-  ];
+  late List<Widget> buttonsList;
+
+  @override
+  void initState() {
+    super.initState();
+    // 初期表示にリストをシャッフル
+    SoundsLists soundsLists = SoundsLists();
+    List<String> shuffledSounds = soundsLists.shuffleSounds();
+
+    buttonsList = shuffledSounds.map((soundPath) {
+      return SoundButton(soundFilePath: soundPath);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +37,12 @@ class _GamePageState extends State<GamePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  '正解！！！',
+                  '「出題する」押して!',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 32,
-                    color: Colors.white,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -80,7 +78,7 @@ class _GamePageState extends State<GamePage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                QuestionSoundButton(),
+                const QuestionSoundButton(),
               ],
             ),
           ),
