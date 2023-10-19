@@ -2,16 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:sound_match_app/component/question_sound_button.dart';
 import 'package:sound_match_app/component/sound_button.dart';
 import 'package:sound_match_app/models/sound_list.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class GamePage extends StatefulWidget {
+class GamePage extends ConsumerStatefulWidget {
   const GamePage({super.key});
 
   @override
-  State<GamePage> createState() => _GamePageState();
+  ConsumerState createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> {
+class _GamePageState extends ConsumerState<GamePage> {
   late List<Widget> buttonsList;
+
+  // 押下したボタンに応じてテキスト変更
+  String matchingText(MatchingStatus status) {
+    switch (status) {
+      case MatchingStatus.correct:
+        return '正解！！';
+      case MatchingStatus.incorrect:
+        return '不正解';
+      case MatchingStatus.waitingForAnswer:
+        return '♪を押してね！';
+      case MatchingStatus.initial:
+      default:
+        return '「出題する」押して！';
+    }
+  }
 
   @override
   void initState() {
@@ -27,6 +43,7 @@ class _GamePageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isMatching = ref.watch(matchingProvider);
     return Scaffold(
       body: Container(
         color: Colors.grey.shade300,
@@ -36,10 +53,10 @@ class _GamePageState extends State<GamePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  '「出題する」押して!',
+                Text(
+                  matchingText(isMatching),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 32,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,

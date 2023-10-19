@@ -34,16 +34,11 @@ final playSoundProvider =
       audioPlayer.stop();
       localTimer?.cancel();
       // ref.read(isAbsorbingProvider.notifier).state = false;
-      print('timerで再生終了');
+      // print('timerで再生終了');
     });
     // localTimer.cancel();
   } catch (e) {
     print("Error playing sound: $e");
+    audioPlayer.stop();
   }
 });
-
-// 再生中
-
-// class AudioPlayer {
-
-// }

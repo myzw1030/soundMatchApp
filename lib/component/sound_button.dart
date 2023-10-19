@@ -3,9 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sound_match_app/models/sound_list.dart';
 
 // 入力無効状態
-final isAbsorbingProvider = StateProvider<bool>((ref) => false);
+final isAbsorbingProvider = StateProvider<bool>((ref) => true);
+// 音声一致かどうか
+final matchingProvider =
+    StateProvider<MatchingStatus>((ref) => MatchingStatus.initial);
+
+enum MatchingStatus {
+  initial, // 初期値
+  correct, // 正解
+  incorrect, // 不正解
+  waitingForAnswer, //回答待ち
+}
 
 class SoundButton extends ConsumerStatefulWidget {
   const SoundButton({
@@ -33,17 +44,53 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     // タイマー開始
     timer = Timer.periodic(const Duration(seconds: 3), (_) {
       setState(() {
-        isButtonPressed = false;
+        soundMatch();
       });
       audioPlayer.stop();
-      ref.read(isAbsorbingProvider.notifier).state = false;
+      // ref.read(isAbsorbingProvider.notifier).state = false;
       timer?.cancel();
     });
   }
 
   // 音を鳴らす
-  void audioPray() async {
-    await audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
+  void audioPlay() async {
+    try {
+      await audioPlayer.play(AssetSource('sounds/${widget.soundFilePath}'));
+    } catch (e) {
+      print('error: $e');
+      audioPlayer.stop();
+    }
+  }
+
+  // 出題との音判定
+  void soundMatch() {
+    final currentRandomSound = ref.watch(randomSoundProvider);
+    if (widget.soundFilePath == currentRandomSound) {
+      print('一致！:${widget.soundFilePath}');
+      isButtonPressed = true;
+    } else {
+      print('不一致..:${widget.soundFilePath}');
+      isButtonPressed = false;
+    }
+  }
+
+  // 押下した時のテキスト変更チェック用
+  void checkMatch(String soundFilePath) {
+    final currentRandomSound = ref.watch(randomSoundProvider);
+    if (soundFilePath == currentRandomSound) {
+      ref.read(matchingProvider.notifier).state = MatchingStatus.correct;
+      resetMatchingState();
+    } else {
+      ref.read(matchingProvider.notifier).state = MatchingStatus.incorrect;
+      resetMatchingState();
+    }
+  }
+
+  // テキスト元に戻す様
+  void resetMatchingState() {
+    Timer(const Duration(seconds: 2), () {
+      ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
+    });
   }
 
   // 初回
@@ -51,22 +98,23 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   void initState() {
     super.initState();
     // 再生中はボタン入力無効playing
-    audioPlayer.onPlayerStateChanged.listen((PlayerState s) => {
-          if (s == PlayerState.playing)
-            {
-              setState(() {
-                ref.read(isAbsorbingProvider.notifier).state = true;
-                debugPrint(
-                    '再生中${ref.read(isAbsorbingProvider.notifier).state}');
-              }),
-            }
-        });
+    // audioPlayer.onPlayerStateChanged.listen((PlayerState s) => {
+    //       if (s == PlayerState.playing)
+    //         {
+    //           setState(() {
+    //             // ref.read(isAbsorbingProvider.notifier).state = true;
+    //             // debugPrint(
+    //             //     '再生中${ref.read(isAbsorbingProvider.notifier).state}');
+    //           }),
+    //         }
+    //     });
     // // 再生終了後、ステータス変更
     audioPlayer.onPlayerComplete.listen((event) {
       setState(() {
-        isButtonPressed = false;
-        ref.read(isAbsorbingProvider.notifier).state = false;
-        debugPrint('再生終了${ref.read(isAbsorbingProvider.notifier).state}');
+        // isButtonPressed = false;
+        soundMatch();
+        // ref.read(isAbsorbingProvider.notifier).state = false;
+        // debugPrint('再生終了${ref.read(isAbsorbingProvider.notifier).state}');
       });
       audioPlayer.stop();
     });
@@ -90,11 +138,13 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         onTap: () {
           setState(() {
             isButtonPressed = true;
-            audioPray();
-            // ref.read(playSoundProvider(widget.soundFilePath));
+            // 出題ボタン押すまで無効化
+            ref.read(isAbsorbingProvider.notifier).state = true;
+            audioPlay();
+            checkMatch(widget.soundFilePath);
             resetAndStartTimer();
           });
-          print('押されたのは：${widget.soundFilePath}');
+          // print('押されたのは：${widget.soundFilePath}');
         },
         child: AnimatedContainer(
           duration: const Duration(
