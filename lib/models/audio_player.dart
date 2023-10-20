@@ -1,44 +1,61 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:async';
 
-// final isAbsorbingProvider = StateProvider<bool>((ref) => false);
+// // Providerを使用してAudioPlayerのインスタンスを生成
+// final audioPlayerProvider = Provider<AudioPlayer>((ref) {
+//   final audioPlayer = AudioPlayer();
 
-// Providerを使用してAudioPlayerのインスタンスを生成
-final audioPlayerProvider = Provider<AudioPlayer>((ref) {
-  final audioPlayer = AudioPlayer();
+//   // 再生が完了したらリソースを解放する
+//   audioPlayer.onPlayerComplete.listen((event) async {
+//     await audioPlayer.release();
+//   });
 
-  // プロバイダが破棄される際に停止・リリース
-  ref.onDispose(() {
-    audioPlayer.stop();
-    audioPlayer.release();
-  });
-  return audioPlayer;
-});
+//   return audioPlayer;
+// });
 
-// 再生した時
-// 非同期、また使用時に引数を指定するため
-final playSoundProvider =
-    FutureProvider.family<void, String>((ref, soundPath) async {
-  final audioPlayer = ref.read(audioPlayerProvider);
+// // 再生した時
+// // 非同期、また使用時に引数を指定するため
+// final playSoundProvider =
+//     FutureProvider.family<void, String>((ref, soundPath) async {
+//   final audioPlayer = ref.read(audioPlayerProvider);
 
-  // Timerはlocal
-  // 再生時間が長い場合強制的に終了させる用
-  Timer? localTimer;
+//   // 再生時間が長い場合強制的に終了させる用
+//   Timer? timer;
 
-  // 音声の再生とエラーハンドリング
-  try {
-    await audioPlayer.play(AssetSource('sounds/$soundPath'));
-    print('再生中');
-    localTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      audioPlayer.stop();
-      localTimer?.cancel();
-      // ref.read(isAbsorbingProvider.notifier).state = false;
-      // print('timerで再生終了');
-    });
-    // localTimer.cancel();
-  } catch (e) {
-    print("Error playing sound: $e");
-    audioPlayer.stop();
+//   // 再生時間が長い場合強制的に終了させる用
+//   void resetAndStartTimer() {
+//     timer?.cancel();
+//     // タイマー開始
+//     timer = Timer.periodic(const Duration(seconds: 3), (_) async {
+//       await audioPlayer.stop();
+//       // ref.read(isAbsorbingProvider.notifier).state = false;
+//       timer?.cancel();
+//     });
+//   }
+
+//   // 音声の再生とエラーハンドリング
+//   try {
+//     if (audioPlayer.state == PlayerState.playing) {
+//       await audioPlayer.stop();
+//     }
+//     await audioPlayer.play(AssetSource('sounds/$soundPath'));
+//     resetAndStartTimer();
+//   } catch (e) {
+//     print("Error playing sound: $e");
+//     await audioPlayer.stop();
+//     await audioPlayer.release(); // エラーが発生した場合もリソースを解放
+//   }
+// });
+
+class AudioService {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // 音を鳴らす
+  void audioPlay(String soundFilePath) async {
+    try {
+      await _audioPlayer.play(AssetSource('sounds/$soundFilePath'));
+    } catch (e) {
+      print('error: $e');
+      await _audioPlayer.stop();
+    }
   }
-});
+}

@@ -29,6 +29,15 @@ class _GamePageState extends ConsumerState<GamePage> {
     }
   }
 
+  bool isQuestionAbsorbing = false;
+
+  // 出題ボタンの状態を変更する
+  void toggleAbsorbing() {
+    setState(() {
+      isQuestionAbsorbing = !isQuestionAbsorbing;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +46,11 @@ class _GamePageState extends ConsumerState<GamePage> {
     List<String> shuffledSounds = soundsLists.shuffleSounds();
 
     buttonsList = shuffledSounds.map((soundPath) {
-      return SoundButton(soundFilePath: soundPath);
+      return SoundButton(
+        soundFilePath: soundPath,
+        isQuestionAbsorbing: isQuestionAbsorbing,
+        toggleAbsorbing: toggleAbsorbing,
+      );
     }).toList();
   }
 
@@ -95,7 +108,10 @@ class _GamePageState extends ConsumerState<GamePage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                const QuestionSoundButton(),
+                QuestionSoundButton(
+                  isQuestionAbsorbing: isQuestionAbsorbing,
+                  toggleAbsorbing: toggleAbsorbing,
+                ),
               ],
             ),
           ),
