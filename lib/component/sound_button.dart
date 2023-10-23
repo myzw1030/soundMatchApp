@@ -12,21 +12,21 @@ final isAbsorbingProvider = StateProvider<bool>((ref) => false);
 final matchingProvider =
     StateProvider<MatchingStatus>((ref) => MatchingStatus.initial);
 
-final firstPressedSoundProvider = StateProvider<String?>((ref) => null);
-final secondPressedSoundProvider = StateProvider<String?>((ref) => null);
-
-// SoundButton
-final firstPressedButtonProvider =
-    StateProvider<_SoundButtonState?>((ref) => null);
-final secondPressedButtonProvider =
-    StateProvider<_SoundButtonState?>((ref) => null);
-
 enum MatchingStatus {
   initial, // 初期値
   correct, // 正解
   incorrect, // 不正解
   waitingForAnswer, //回答待ち
 }
+
+final firstPressedSoundProvider = StateProvider<String?>((ref) => null);
+final secondPressedSoundProvider = StateProvider<String?>((ref) => null);
+
+// SoundButton
+final firstButtonStateProvider =
+    StateProvider<_SoundButtonState?>((ref) => null);
+final secondButtonStateProvider =
+    StateProvider<_SoundButtonState?>((ref) => null);
 
 class SoundButton extends ConsumerStatefulWidget {
   const SoundButton({
@@ -57,13 +57,12 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   void resetAndStartTimer() {
     timer?.cancel();
     // タイマー開始
-    timer = Timer.periodic(const Duration(seconds: 2), (_) async {
+    timer = Timer(const Duration(seconds: 2), () async {
       // setState(() {
       //   soundMatch();
       // });
       await audioPlayer.stop();
       await audioPlayer.release();
-      timer?.cancel();
     });
   }
 
@@ -79,8 +78,10 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
 
   // ボタンの状態をリセットするメソッド
   void resetButton() {
-    setState(() {
-      isButtonPressed = false;
+    Timer(const Duration(seconds: 1), () {
+      setState(() {
+        isButtonPressed = false;
+      });
     });
   }
 
@@ -95,7 +96,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       print('1つめが押された');
       ref.read(firstPressedSoundProvider.notifier).state = widget.soundFilePath;
       // 最初にタップされたSoundButtonの状態をfirstPressedButtonProviderに保存
-      ref.read(firstPressedButtonProvider.notifier).state = this;
+      ref.read(firstButtonStateProvider.notifier).state = this;
       // 押下動作
       setState(() {
         isButtonPressed = true;
@@ -105,7 +106,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       ref.read(secondPressedSoundProvider.notifier).state =
           widget.soundFilePath;
       // 2つ目にタップされたSoundButtonの状態をsecondPressedButtonProviderに保存
-      ref.read(secondPressedButtonProvider.notifier).state = this;
+      ref.read(secondButtonStateProvider.notifier).state = this;
       // 押下動作
       setState(() {
         isButtonPressed = true;
@@ -116,13 +117,13 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         matchedSounds.add(widget.soundFilePath);
       } else {
         print('不一致');
-        // 最初に押されたボタンの状態を取得し、それに対してのみリセット
-        final firstButton = ref.read(firstPressedButtonProvider.notifier).state;
-        firstButton?.resetButton(); // ボタンの状態をリセット
+        // 最初に押されたボタンの状態を取得しリセット
+        final firstButton = ref.read(firstButtonStateProvider.notifier).state;
+        // ボタンの状態をリセット
+        firstButton?.resetButton();
         // 2つ目リセット
-        setState(() {
-          isButtonPressed = false;
-        });
+        final secondButton = ref.read(secondButtonStateProvider.notifier).state;
+        secondButton?.resetButton();
       }
 
       // リセット
