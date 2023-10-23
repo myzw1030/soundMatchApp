@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sound_match_app/component/question_sound_button.dart';
 import 'package:sound_match_app/component/sound_button.dart';
 import 'package:sound_match_app/models/sound_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,13 +30,6 @@ class _GamePageState extends ConsumerState<GamePage> {
 
   bool isQuestionAbsorbing = false;
 
-  // 出題ボタンの状態を変更する
-  void toggleAbsorbing() {
-    setState(() {
-      isQuestionAbsorbing = !isQuestionAbsorbing;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -48,8 +40,6 @@ class _GamePageState extends ConsumerState<GamePage> {
     buttonsList = shuffledSounds.map((soundPath) {
       return SoundButton(
         soundFilePath: soundPath,
-        isQuestionAbsorbing: isQuestionAbsorbing,
-        toggleAbsorbing: toggleAbsorbing,
       );
     }).toList();
   }
@@ -107,11 +97,11 @@ class _GamePageState extends ConsumerState<GamePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
-                QuestionSoundButton(
-                  isQuestionAbsorbing: isQuestionAbsorbing,
-                  toggleAbsorbing: toggleAbsorbing,
-                ),
+                // const SizedBox(height: 40),
+                // QuestionSoundButton(
+                //   isQuestionAbsorbing: isQuestionAbsorbing,
+                //   toggleAbsorbing: toggleAbsorbing,
+                // ),
               ],
             ),
           ),

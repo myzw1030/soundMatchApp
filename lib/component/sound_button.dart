@@ -6,11 +6,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sound_match_app/models/sound_list.dart';
 
 // ♪ボタン：入力無効状態
-final isAbsorbingProvider = StateProvider<bool>((ref) => true);
+final isAbsorbingProvider = StateProvider<bool>((ref) => false);
 
 // 音声一致かどうか
 final matchingProvider =
     StateProvider<MatchingStatus>((ref) => MatchingStatus.initial);
+
+final firstPressedSoundProvider = StateProvider<String?>((ref) => null);
+final secondPressedSoundProvider = StateProvider<String?>((ref) => null);
+
+// SoundButton
+final firstPressedButtonProvider =
+    StateProvider<_SoundButtonState?>((ref) => null);
+final secondPressedButtonProvider =
+    StateProvider<_SoundButtonState?>((ref) => null);
 
 enum MatchingStatus {
   initial, // 初期値
@@ -22,14 +31,10 @@ enum MatchingStatus {
 class SoundButton extends ConsumerStatefulWidget {
   const SoundButton({
     Key? key,
-    required this.isQuestionAbsorbing,
-    required this.toggleAbsorbing,
     required this.soundFilePath,
   }) : super(key: key);
 
   final String soundFilePath;
-  final bool isQuestionAbsorbing;
-  final Function toggleAbsorbing;
 
   @override
   ConsumerState createState() => _SoundButtonState();
@@ -38,7 +43,10 @@ class SoundButton extends ConsumerStatefulWidget {
 class _SoundButtonState extends ConsumerState<SoundButton> {
   // 押した時の状態
   bool isButtonPressed = false;
-  bool isQuestionAbsorbing = false;
+  String? firstPressedSound;
+  String? secondPressedSound;
+  // 最初に押されたボタンの参照
+  _SoundButtonState? firstPressedButton;
 
   // 時間
   Timer? timer;
@@ -50,9 +58,9 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     timer?.cancel();
     // タイマー開始
     timer = Timer.periodic(const Duration(seconds: 2), (_) async {
-      setState(() {
-        soundMatch();
-      });
+      // setState(() {
+      //   soundMatch();
+      // });
       await audioPlayer.stop();
       await audioPlayer.release();
       timer?.cancel();
@@ -69,15 +77,57 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     }
   }
 
-  // 出題との音判定
-  void soundMatch() {
-    final currentRandomSound = ref.watch(randomSoundProvider);
-    if (widget.soundFilePath == currentRandomSound) {
-      print('一致！:${widget.soundFilePath}');
-      isButtonPressed = true;
-    } else {
-      print('不一致..:${widget.soundFilePath}');
+  // ボタンの状態をリセットするメソッド
+  void resetButton() {
+    setState(() {
       isButtonPressed = false;
+    });
+  }
+
+  // 2つの音を保存するための変数
+// 出題との音判定
+  List<String> matchedSounds = [];
+  void soundMatch() {
+    final firstSound = ref.read(firstPressedSoundProvider.notifier).state;
+    final secondSound = ref.read(secondPressedSoundProvider.notifier).state;
+
+    if (firstSound == null) {
+      print('1つめが押された');
+      ref.read(firstPressedSoundProvider.notifier).state = widget.soundFilePath;
+      // 最初にタップされたSoundButtonの状態をfirstPressedButtonProviderに保存
+      ref.read(firstPressedButtonProvider.notifier).state = this;
+      // 押下動作
+      setState(() {
+        isButtonPressed = true;
+      });
+    } else if (secondSound == null) {
+      print('2つめが押された');
+      ref.read(secondPressedSoundProvider.notifier).state =
+          widget.soundFilePath;
+      // 2つ目にタップされたSoundButtonの状態をsecondPressedButtonProviderに保存
+      ref.read(secondPressedButtonProvider.notifier).state = this;
+      // 押下動作
+      setState(() {
+        isButtonPressed = true;
+      });
+
+      if (firstSound == widget.soundFilePath) {
+        print('一致');
+        matchedSounds.add(widget.soundFilePath);
+      } else {
+        print('不一致');
+        // 最初に押されたボタンの状態を取得し、それに対してのみリセット
+        final firstButton = ref.read(firstPressedButtonProvider.notifier).state;
+        firstButton?.resetButton(); // ボタンの状態をリセット
+        // 2つ目リセット
+        setState(() {
+          isButtonPressed = false;
+        });
+      }
+
+      // リセット
+      ref.read(firstPressedSoundProvider.notifier).state = null;
+      ref.read(secondPressedSoundProvider.notifier).state = null;
     }
   }
 
@@ -117,9 +167,9 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     //     });
     // // 再生終了後、ステータス変更
     audioPlayer.onPlayerComplete.listen((event) {
-      setState(() {
-        soundMatch();
-      });
+      // setState(() {
+      //   soundMatch();
+      // });
       // audioPlayer.stop();
     });
   }
@@ -140,14 +190,19 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       absorbing: isAbsorbing,
       child: GestureDetector(
         onTap: () {
-          isButtonPressed = true;
+          // setState(() {
+          //   // 押したときにボタンが沈む
+          //   isButtonPressed = true;
+          // });
+          soundMatch();
+          // print(isButtonPressed);
           // 出題ボタンの状態を変更
-          widget.toggleAbsorbing();
+          // widget.toggleAbsorbing();
           // ♪ボタン無効化
-          ref.read(isAbsorbingProvider.notifier).state = true;
+          // ref.read(isAbsorbingProvider.notifier).state = true;
           // 効果音
           audioPlay();
-          checkMatch(widget.soundFilePath);
+          // checkMatch(widget.soundFilePath);
           resetAndStartTimer();
         },
         child: AnimatedContainer(

@@ -26,19 +26,19 @@ class SoundsLists {
 // 音声ファイルリスト
   List<String> soundLists = [
     'cat01.mp3',
-    'cat02.mp3',
-    'chicken01.mp3',
-    'cicada01.mp3',
+    // 'cat02.mp3',
+    // 'chicken01.mp3',
+    // 'cicada01.mp3',
     'cow01.mp3',
     'crow01.mp3',
-    'cuckoo01.mp3',
+    // 'cuckoo01.mp3',
     'dog01.mp3',
-    'dog02.mp3',
+    // 'dog02.mp3',
     'elephant01.mp3',
     'horse01.mp3',
-    'japanese-nightingale.mp3',
-    'lion02.mp3',
-    'pig01.mp3',
+    // 'japanese-nightingale.mp3',
+    // 'lion02.mp3',
+    // 'pig01.mp3',
     'sheep01.mp3',
     'wolf01.mp3',
   ];
@@ -51,8 +51,12 @@ class SoundsLists {
 
   // リストをシャッフルする
   List<String> shuffleSounds() {
-    List<String> shuffledList = List.from(soundLists);
-    shuffledList.shuffle();
-    return shuffledList;
+    List<String> doubleList = [];
+    for (var sound in soundLists) {
+      doubleList.add(sound);
+      doubleList.add(sound);
+    }
+    doubleList.shuffle();
+    return doubleList;
   }
 }
