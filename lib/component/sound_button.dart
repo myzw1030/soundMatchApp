@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sound_match_app/models/sound_list.dart';
-
-// ♪ボタン：入力無効状態
-final isAbsorbingProvider = StateProvider<bool>((ref) => false);
+import 'package:collection/collection.dart';
 
 // 音声一致かどうか
 final matchingProvider =
@@ -18,6 +16,9 @@ enum MatchingStatus {
   incorrect, // 不正解
   waitingForAnswer, //回答待ち
 }
+
+// 効果音を格納
+final matchedSoundsProvider = StateProvider<List<String>>((ref) => []);
 
 final firstPressedSoundProvider = StateProvider<String?>((ref) => null);
 final secondPressedSoundProvider = StateProvider<String?>((ref) => null);
@@ -43,8 +44,12 @@ class SoundButton extends ConsumerStatefulWidget {
 class _SoundButtonState extends ConsumerState<SoundButton> {
   // 押した時の状態
   bool isButtonPressed = false;
+  // 無効化状態
+  bool isAbsorbing = false;
+
   String? firstPressedSound;
   String? secondPressedSound;
+
   // 最初に押されたボタンの参照
   _SoundButtonState? firstPressedButton;
 
@@ -58,9 +63,6 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     timer?.cancel();
     // タイマー開始
     timer = Timer(const Duration(seconds: 2), () async {
-      // setState(() {
-      //   soundMatch();
-      // });
       await audioPlayer.stop();
       await audioPlayer.release();
     });
@@ -76,7 +78,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     }
   }
 
-  // ボタンの状態をリセットするメソッド
+  // ボタンの状態をリセット
   void resetButton() {
     Timer(const Duration(seconds: 1), () {
       setState(() {
@@ -85,9 +87,15 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     });
   }
 
-  // 2つの音を保存するための変数
-// 出題との音判定
-  List<String> matchedSounds = [];
+  // ♪ボタン無効化用
+  void changeAbsorbing() {
+    setState(() {
+      isAbsorbing = true;
+    });
+  }
+
+  // 出題との音判定
+
   void soundMatch() {
     final firstSound = ref.read(firstPressedSoundProvider.notifier).state;
     final secondSound = ref.read(secondPressedSoundProvider.notifier).state;
@@ -112,18 +120,54 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         isButtonPressed = true;
       });
 
+      // ひとつめ・ふたつめに押されたボタンの状態を取得
+      final firstButton = ref.read(firstButtonStateProvider.notifier).state;
+      final secondButton = ref.read(secondButtonStateProvider.notifier).state;
+
       if (firstSound == widget.soundFilePath) {
         print('一致');
-        matchedSounds.add(widget.soundFilePath);
+        // 「正解」のテキスト用
+        ref.read(matchingProvider.notifier).state = MatchingStatus.correct;
+        // ♪ボタン無効化
+        firstButton?.changeAbsorbing();
+        secondButton?.changeAbsorbing();
+
+        // 時間差でテキストを初期に戻す
+        Timer(const Duration(seconds: 1), () {
+          ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
+        });
+
+        // 一致した効果音は配列へ格納
+        final currentMatchedSounds =
+            ref.read(matchedSoundsProvider.notifier).state;
+        currentMatchedSounds.add(widget.soundFilePath);
+        ref.read(matchedSoundsProvider.notifier).state = currentMatchedSounds;
+        print(currentMatchedSounds);
+
+        // 格納された配列と元々のsoundsListsを比較
+        final soundsLists = ref.read(soundsListsProvider).soundLists;
+
+        final deepEq = const DeepCollectionEquality.unordered().equals;
+        print('soundsLists:$soundsLists');
+        print('currentMatchedSounds:$currentMatchedSounds');
+        print(deepEq(currentMatchedSounds, soundsLists));
+        if (deepEq(currentMatchedSounds, soundsLists)) {
+          print('全てクリア');
+        } else {
+          print('まだまだ');
+        }
       } else {
         print('不一致');
-        // 最初に押されたボタンの状態を取得しリセット
-        final firstButton = ref.read(firstButtonStateProvider.notifier).state;
+        // 「不正解」のテキスト用
+        ref.read(matchingProvider.notifier).state = MatchingStatus.incorrect;
+
         // ボタンの状態をリセット
         firstButton?.resetButton();
-        // 2つ目リセット
-        final secondButton = ref.read(secondButtonStateProvider.notifier).state;
         secondButton?.resetButton();
+        // 時間差でテキストを初期に戻す
+        Timer(const Duration(seconds: 1), () {
+          ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
+        });
       }
 
       // リセット
@@ -155,55 +199,33 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   @override
   void initState() {
     super.initState();
-    // 再生中はボタン入力無効playing
-    // audioPlayer.onPlayerStateChanged.listen((PlayerState s) => {
-    //       if (s == PlayerState.playing)
-    //         {
-    //           setState(() {
-    //             // ref.read(isAbsorbingProvider.notifier).state = true;
-    //             // debugPrint(
-    //             //     '再生中${ref.read(isAbsorbingProvider.notifier).state}');
-    //           }),
-    //         }
-    //     });
+
     // // 再生終了後、ステータス変更
-    audioPlayer.onPlayerComplete.listen((event) {
-      // setState(() {
-      //   soundMatch();
-      // });
-      // audioPlayer.stop();
-    });
+    // audioPlayer.onPlayerComplete.listen((event) {
+    // setState(() {
+    //   soundMatch();
+    // });
+    // audioPlayer.stop();
+    // });
   }
 
   // リソースのクリーンアップ
   @override
   void dispose() async {
-    await audioPlayer.dispose();
     super.dispose();
+    await audioPlayer.dispose();
+    timer?.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
-    // absorbingの状態を取得
-    final bool isAbsorbing = ref.watch(isAbsorbingProvider);
-
     return AbsorbPointer(
       absorbing: isAbsorbing,
       child: GestureDetector(
         onTap: () {
-          // setState(() {
-          //   // 押したときにボタンが沈む
-          //   isButtonPressed = true;
-          // });
           soundMatch();
-          // print(isButtonPressed);
-          // 出題ボタンの状態を変更
-          // widget.toggleAbsorbing();
-          // ♪ボタン無効化
-          // ref.read(isAbsorbingProvider.notifier).state = true;
           // 効果音
           audioPlay();
-          // checkMatch(widget.soundFilePath);
           resetAndStartTimer();
         },
         child: AnimatedContainer(

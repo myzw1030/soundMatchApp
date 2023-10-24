@@ -24,11 +24,9 @@ class _GamePageState extends ConsumerState<GamePage> {
         return '♪を押してね！';
       case MatchingStatus.initial:
       default:
-        return '「出題する」押して！';
+        return '同じ♪を見つけよう！';
     }
   }
-
-  bool isQuestionAbsorbing = false;
 
   @override
   void initState() {
@@ -97,11 +95,6 @@ class _GamePageState extends ConsumerState<GamePage> {
                     ),
                   ),
                 ),
-                // const SizedBox(height: 40),
-                // QuestionSoundButton(
-                //   isQuestionAbsorbing: isQuestionAbsorbing,
-                //   toggleAbsorbing: toggleAbsorbing,
-                // ),
               ],
             ),
           ),
