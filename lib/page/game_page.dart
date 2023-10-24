@@ -40,6 +40,13 @@ class _GamePageState extends ConsumerState<GamePage> {
         soundFilePath: soundPath,
       );
     }).toList();
+
+    // カウントは初期表示0
+    // build完了後にコールバックされる
+    // (initStateでの初期の段階でProviderにアクセスできないため)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.watch(countProvider.notifier).state = 0;
+    });
   }
 
   @override
