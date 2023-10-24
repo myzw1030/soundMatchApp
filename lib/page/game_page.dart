@@ -17,11 +17,11 @@ class _GamePageState extends ConsumerState<GamePage> {
   String matchingText(MatchingStatus status) {
     switch (status) {
       case MatchingStatus.correct:
-        return '正解！！';
+        return '正解♪';
       case MatchingStatus.incorrect:
-        return '不正解';
-      case MatchingStatus.waitingForAnswer:
-        return '♪を押してね！';
+        return '不正解♪';
+      case MatchingStatus.clear:
+        return 'ゲームクリア♪';
       case MatchingStatus.initial:
       default:
         return '同じ♪を見つけよう！';
@@ -45,6 +45,7 @@ class _GamePageState extends ConsumerState<GamePage> {
   @override
   Widget build(BuildContext context) {
     final isMatching = ref.watch(matchingProvider);
+    final pressedCount = ref.watch(countProvider);
     return Scaffold(
       body: Container(
         color: Colors.grey.shade300,
@@ -54,11 +55,41 @@ class _GamePageState extends ConsumerState<GamePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'チャレンジ回数：',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '$pressedCount',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text(
+                      '回',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
                 Text(
                   matchingText(isMatching),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 32,
+                    fontSize: 30,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),

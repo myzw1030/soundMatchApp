@@ -14,7 +14,7 @@ enum MatchingStatus {
   initial, // 初期値
   correct, // 正解
   incorrect, // 不正解
-  waitingForAnswer, //回答待ち
+  clear, // ゲームクリア
 }
 
 // 効果音を格納
@@ -28,6 +28,9 @@ final firstButtonStateProvider =
     StateProvider<_SoundButtonState?>((ref) => null);
 final secondButtonStateProvider =
     StateProvider<_SoundButtonState?>((ref) => null);
+
+// カウント
+final countProvider = StateProvider<int>((ref) => 0);
 
 class SoundButton extends ConsumerStatefulWidget {
   const SoundButton({
@@ -94,8 +97,12 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     });
   }
 
-  // 出題との音判定
+  // カウンター
+  void pressedCounter() {
+    ref.watch(countProvider.notifier).state++;
+  }
 
+  // 出題との音判定
   void soundMatch() {
     final firstSound = ref.read(firstPressedSoundProvider.notifier).state;
     final secondSound = ref.read(secondPressedSoundProvider.notifier).state;
@@ -132,29 +139,25 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         firstButton?.changeAbsorbing();
         secondButton?.changeAbsorbing();
 
-        // 時間差でテキストを初期に戻す
-        Timer(const Duration(seconds: 1), () {
-          ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
-        });
-
         // 一致した効果音は配列へ格納
         final currentMatchedSounds =
             ref.read(matchedSoundsProvider.notifier).state;
         currentMatchedSounds.add(widget.soundFilePath);
         ref.read(matchedSoundsProvider.notifier).state = currentMatchedSounds;
-        print(currentMatchedSounds);
 
         // 格納された配列と元々のsoundsListsを比較
         final soundsLists = ref.read(soundsListsProvider).soundLists;
-
         final deepEq = const DeepCollectionEquality.unordered().equals;
-        print('soundsLists:$soundsLists');
-        print('currentMatchedSounds:$currentMatchedSounds');
-        print(deepEq(currentMatchedSounds, soundsLists));
+        // print('currentMatchedSounds:$currentMatchedSounds');
+        // print(deepEq(currentMatchedSounds, soundsLists));
         if (deepEq(currentMatchedSounds, soundsLists)) {
           print('全てクリア');
+          ref.read(matchingProvider.notifier).state = MatchingStatus.clear;
         } else {
-          print('まだまだ');
+          // 時間差でテキストを初期に戻す
+          Timer(const Duration(seconds: 1), () {
+            ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
+          });
         }
       } else {
         print('不一致');
@@ -169,6 +172,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
           ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
         });
       }
+      pressedCounter();
 
       // リセット
       ref.read(firstPressedSoundProvider.notifier).state = null;

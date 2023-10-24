@@ -19,6 +19,7 @@ dependencies:
   audioplayers: ^4.1.0
   flutter_riverpod: ^2.3.7
   custom_lint: ^0.2.5
+  collection: ^1.17.2
 
 dev_dependencies:
   flutter_test:
