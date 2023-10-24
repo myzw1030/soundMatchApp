@@ -30,6 +30,7 @@ class TopPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
       // appBar: AppBar(title: const Text('aa')),
       body: SafeArea(
         child: Center(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sound_match_app/component/clear_dialog.dart';
 import 'package:sound_match_app/models/sound_list.dart';
 import 'package:collection/collection.dart';
 
@@ -126,6 +127,16 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       setState(() {
         isButtonPressed = true;
       });
+
+      showDialog(
+        context: context,
+        builder: (_) {
+          return WillPopScope(
+            child: const ClearDialog(),
+            onWillPop: () async => false,
+          );
+        },
+      );
 
       // ひとつめ・ふたつめに押されたボタンの状態を取得
       final firstButton = ref.read(firstButtonStateProvider.notifier).state;
