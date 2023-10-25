@@ -127,7 +127,6 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       setState(() {
         isButtonPressed = true;
       });
-
       showDialog(
         context: context,
         builder: (_) {
@@ -164,6 +163,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         if (deepEq(currentMatchedSounds, soundsLists)) {
           print('全てクリア');
           ref.read(matchingProvider.notifier).state = MatchingStatus.clear;
+          // クリアしたらモーダル表示
         } else {
           // 時間差でテキストを初期に戻す
           Timer(const Duration(seconds: 1), () {
@@ -183,6 +183,8 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
           ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
         });
       }
+
+      // チャレンジ回数をカウント
       pressedCounter();
 
       // リセット
@@ -211,18 +213,10 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
   }
 
   // 初回
-  @override
-  void initState() {
-    super.initState();
-
-    // // 再生終了後、ステータス変更
-    // audioPlayer.onPlayerComplete.listen((event) {
-    // setState(() {
-    //   soundMatch();
-    // });
-    // audioPlayer.stop();
-    // });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
 
   // リソースのクリーンアップ
   @override

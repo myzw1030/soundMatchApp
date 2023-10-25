@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sound_match_app/component/next_button.dart';
-import 'package:sound_match_app/page/game_page.dart';
-import 'package:sound_match_app/page/rule_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sound_match_app/router.dart';
 
 void main() {
   runApp(
@@ -15,11 +15,10 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: TopPage(),
+    return MaterialApp.router(
+      routerConfig: router,
     );
   }
 }
@@ -31,7 +30,6 @@ class TopPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      // appBar: AppBar(title: const Text('aa')),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -56,27 +54,8 @@ class TopPage extends StatelessWidget {
                 child: Column(
                   children: [
                     NextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const GamePage(),
-                          ),
-                        );
-                      },
+                      onPressed: () => context.go('/gamePage'),
                       text: 'ゲームをはじめる',
-                    ),
-                    const SizedBox(height: 16),
-                    NextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RulePage(),
-                          ),
-                        );
-                      },
-                      text: 'あそびかた',
                     ),
                   ],
                 ),

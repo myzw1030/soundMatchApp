@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sound_match_app/component/sound_button.dart';
+import 'package:sound_match_app/models/sound_list.dart';
 
-class ClearDialog extends StatelessWidget {
+class ClearDialog extends ConsumerStatefulWidget {
   const ClearDialog({super.key});
 
   @override
+  ConsumerState createState() => _ClearDialogState();
+}
+
+class _ClearDialogState extends ConsumerState<ClearDialog> {
+  late List<Widget> buttonsList;
+  // クリアまでの回数でテキスト変更
+  String clearText = '素晴らしい！';
+
+  String matchedClearText(int matchCount) {
+    if (matchCount <= 8) {
+      return clearText = '神の領域です！';
+    } else if (matchCount >= 9 && matchCount <= 16) {
+      return clearText = '素晴らしい！';
+    } else if (matchCount >= 17 && matchCount <= 24) {
+      return clearText = 'まだまだですね！';
+    } else {
+      return clearText = '頑張ろう！';
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final pressedCount = ref.watch(countProvider);
+    matchedClearText(pressedCount);
     return Dialog(
       shape: Border.all(
         width: 4,
@@ -31,18 +58,32 @@ class ClearDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              '12回でクリア！',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 30,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '$pressedCount',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Text(
+                  '回でクリア！',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
-            const Text(
-              'まだまだですね♪',
+            Text(
+              clearText,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
               ),
             ),
@@ -67,7 +108,19 @@ class ClearDialog extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                Navigator.pop(context);
+                // 初期表示にリストをシャッフル
+                SoundsLists soundsLists = SoundsLists();
+                List<String> shuffledSounds = soundsLists.shuffleSounds();
+                setState(() {
+                  buttonsList = shuffledSounds.map((soundPath) {
+                    return SoundButton(
+                      soundFilePath: soundPath,
+                    );
+                  }).toList();
+                });
+                ref.watch(countProvider.notifier).state = 0;
+                // 元の画面へ戻る（モーダル閉じる）
+                context.pop();
               },
             ),
             const SizedBox(height: 20),
@@ -90,7 +143,8 @@ class ClearDialog extends StatelessWidget {
                   ),
                 ),
               ),
-              onTap: () {},
+              // ホーム画面へ
+              onTap: () => context.go('/'),
             )
           ],
         ),
