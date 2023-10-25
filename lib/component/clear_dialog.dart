@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sound_match_app/component/clear_button.dart';
 import 'package:sound_match_app/component/sound_button.dart';
 import 'package:sound_match_app/models/sound_list.dart';
+import 'package:sound_match_app/page/game_page.dart';
 
 class ClearDialog extends ConsumerStatefulWidget {
   const ClearDialog({super.key});
@@ -13,6 +15,7 @@ class ClearDialog extends ConsumerStatefulWidget {
 
 class _ClearDialogState extends ConsumerState<ClearDialog> {
   late List<Widget> buttonsList;
+
   // クリアまでの回数でテキスト変更
   String clearText = '素晴らしい！';
 
@@ -23,9 +26,36 @@ class _ClearDialogState extends ConsumerState<ClearDialog> {
       return clearText = '素晴らしい！';
     } else if (matchCount >= 17 && matchCount <= 24) {
       return clearText = 'まだまだですね！';
-    } else {
+    } else if (matchCount >= 25 && matchCount <= 32) {
       return clearText = '頑張ろう！';
+    } else {
+      return clearText = '。。。笑';
     }
+  }
+
+  // クリアに応じて星の数を変更
+  List<Widget> generateStars(int matchCount) {
+    int starCount;
+
+    if (matchCount <= 8) {
+      starCount = 5;
+    } else if (matchCount >= 9 && matchCount <= 16) {
+      starCount = 4;
+    } else if (matchCount >= 17 && matchCount <= 24) {
+      starCount = 3;
+    } else if (matchCount >= 25 && matchCount <= 32) {
+      starCount = 2;
+    } else {
+      starCount = 1;
+    }
+
+    return List.generate(
+      starCount,
+      (index) => Icon(
+        Icons.star,
+        color: Colors.yellow.shade800,
+      ),
+    );
   }
 
   @override
@@ -44,16 +74,18 @@ class _ClearDialogState extends ConsumerState<ClearDialog> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.star,
-              color: Colors.yellow.shade800,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ...generateStars(pressedCount),
+              ],
             ),
             const SizedBox(height: 20),
             const Text(
-              'おめでとうございます♪',
+              'Congratulations!!!',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -88,64 +120,31 @@ class _ClearDialogState extends ConsumerState<ClearDialog> {
               ),
             ),
             const SizedBox(height: 30),
-            GestureDetector(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  // color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                child: const Text(
-                  'もう一度挑戦',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                  ),
-                ),
-              ),
+            ClearButton(
+              color: Colors.green.shade400,
+              text: 'もう一度挑戦',
               onTap: () {
                 // 初期表示にリストをシャッフル
-                SoundsLists soundsLists = SoundsLists();
-                List<String> shuffledSounds = soundsLists.shuffleSounds();
-                setState(() {
-                  buttonsList = shuffledSounds.map((soundPath) {
-                    return SoundButton(
-                      soundFilePath: soundPath,
-                    );
-                  }).toList();
-                });
-                ref.watch(countProvider.notifier).state = 0;
-                // 元の画面へ戻る（モーダル閉じる）
-                context.pop();
+                // 状態更新
+                // ref.read(buttonsListProvider.notifier).initializeGame();
+                // ref.read(countProvider.notifier).resetCount();
+                // モーダル閉じる
+                // context.pop();
+                // 元の画面へ戻る
+                // context.go('/gamePage');
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const GamePage()),
+                );
               },
             ),
             const SizedBox(height: 20),
-            GestureDetector(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  // color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                child: const Text(
-                  'ゲームをやめる',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                  ),
-                ),
-              ),
-              // ホーム画面へ
-              onTap: () => context.go('/'),
-            )
+            ClearButton(
+              color: Colors.red.shade400,
+              text: 'ゲームをやめる',
+              onTap: () {
+                context.go('/');
+              },
+            ),
           ],
         ),
       ),

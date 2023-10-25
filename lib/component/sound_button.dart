@@ -30,9 +30,6 @@ final firstButtonStateProvider =
 final secondButtonStateProvider =
     StateProvider<_SoundButtonState?>((ref) => null);
 
-// カウント
-final countProvider = StateProvider<int>((ref) => 0);
-
 class SoundButton extends ConsumerStatefulWidget {
   const SoundButton({
     Key? key,
@@ -98,11 +95,6 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     });
   }
 
-  // カウンター
-  void pressedCounter() {
-    ref.watch(countProvider.notifier).state++;
-  }
-
   // 出題との音判定
   void soundMatch() {
     final firstSound = ref.read(firstPressedSoundProvider.notifier).state;
@@ -127,15 +119,6 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       setState(() {
         isButtonPressed = true;
       });
-      showDialog(
-        context: context,
-        builder: (_) {
-          return WillPopScope(
-            child: const ClearDialog(),
-            onWillPop: () async => false,
-          );
-        },
-      );
 
       // ひとつめ・ふたつめに押されたボタンの状態を取得
       final firstButton = ref.read(firstButtonStateProvider.notifier).state;
@@ -163,7 +146,18 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         if (deepEq(currentMatchedSounds, soundsLists)) {
           print('全てクリア');
           ref.read(matchingProvider.notifier).state = MatchingStatus.clear;
+          // timer?.cancel();
+
           // クリアしたらモーダル表示
+          showDialog(
+            context: context,
+            builder: (_) {
+              return WillPopScope(
+                child: const ClearDialog(),
+                onWillPop: () async => false,
+              );
+            },
+          );
         } else {
           // 時間差でテキストを初期に戻す
           Timer(const Duration(seconds: 1), () {
@@ -185,31 +179,12 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       }
 
       // チャレンジ回数をカウント
-      pressedCounter();
+      ref.read(countProvider.notifier).increment();
 
       // リセット
       ref.read(firstPressedSoundProvider.notifier).state = null;
       ref.read(secondPressedSoundProvider.notifier).state = null;
     }
-  }
-
-  // 押下した時のテキスト変更チェック用
-  void checkMatch(String soundFilePath) {
-    final currentRandomSound = ref.watch(randomSoundProvider);
-    if (soundFilePath == currentRandomSound) {
-      ref.read(matchingProvider.notifier).state = MatchingStatus.correct;
-      resetMatchingState();
-    } else {
-      ref.read(matchingProvider.notifier).state = MatchingStatus.incorrect;
-      resetMatchingState();
-    }
-  }
-
-  // テキスト元に戻す様
-  void resetMatchingState() {
-    Timer(const Duration(seconds: 1), () {
-      ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
-    });
   }
 
   // 初回

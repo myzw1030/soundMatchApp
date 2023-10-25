@@ -1,25 +1,50 @@
 import 'dart:math';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sound_match_app/component/sound_button.dart';
 
 final soundsListsProvider = Provider((ref) => SoundsLists());
 
-final randomSoundProvider = StateNotifierProvider<SoundNotifier, String>((ref) {
-  final sounds = ref.read(soundsListsProvider);
-  return SoundNotifier(sounds);
-});
+// 1. StateNotifierを使用して状態を管理するクラスを作成
+class ButtonsListNotifier extends StateNotifier<List<Widget>> {
+  ButtonsListNotifier() : super([]);
 
-class SoundNotifier extends StateNotifier<String> {
-  final SoundsLists sounds;
-
-  // 初期状態をランダムな音声ファイル
-  SoundNotifier(this.sounds) : super(sounds.getRandomSound());
-
-  // ランダムに音声ファイルの状態を更新・取得
-  String updateAndFetchRandomSound() {
-    state = sounds.getRandomSound();
-    return state;
+  // ゲームの初期化
+  // 初期表示にリストをシャッフル
+  void initializeGame() {
+    SoundsLists soundsLists = SoundsLists();
+    List<String> shuffledSounds = soundsLists.shuffleSounds();
+    state = shuffledSounds.map((soundPath) {
+      return SoundButton(
+        soundFilePath: soundPath,
+      );
+    }).toList();
   }
 }
+
+class CountNotifier extends StateNotifier<int> {
+  CountNotifier() : super(0);
+
+  // カウント
+  void increment() {
+    state++;
+  }
+
+  // リセット
+  void resetCount() {
+    state = 0;
+  }
+}
+
+// 2. StateNotifierProviderを使用して、そのクラスのインスタンスを提供
+final buttonsListProvider =
+    StateNotifierProvider<ButtonsListNotifier, List<Widget>>((ref) {
+  return ButtonsListNotifier();
+});
+
+final countProvider = StateNotifierProvider<CountNotifier, int>((ref) {
+  return CountNotifier();
+});
 
 // 音声ファイルリストを管理
 class SoundsLists {
@@ -45,9 +70,9 @@ class SoundsLists {
 
   // ランダムに音声ファイルを取得する
   final random = Random();
-  String getRandomSound() {
-    return soundLists[random.nextInt(soundLists.length)];
-  }
+  // String getRandomSound() {
+  //   return soundLists[random.nextInt(soundLists.length)];
+  // }
 
   // リストをシャッフルする
   List<String> shuffleSounds() {
