@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.sound_match_app">
+    package="com.miyazawa.soundMatch">
    <application
-        android:label="sound_match_app"
+        android:label="オトマッチェ"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

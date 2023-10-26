@@ -1,13 +1,17 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sound_match_app/component/next_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sound_match_app/router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // 画面の向きを固定
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(
     const ProviderScope(
       child: MyApp(),

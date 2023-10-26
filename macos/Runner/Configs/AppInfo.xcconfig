@@ -8,7 +8,7 @@
 PRODUCT_NAME = sound_match_app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.soundMatchApp
+PRODUCT_BUNDLE_IDENTIFIER = com.miyazawa.soundMatch
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2023 miyazawa. All rights reserved.
