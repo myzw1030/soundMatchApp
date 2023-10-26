@@ -24,6 +24,7 @@ dependencies:
   google_fonts: ^4.0.4
   flutter_launcher_icons: ^0.12.0
   flutter_animated_dialog: ^2.0.1
+  flutter_native_splash: ^2.3.4
 
 dev_dependencies:
   flutter_test:
@@ -44,3 +45,7 @@ flutter_icons:
   android: true
   adaptive_icon_background: "assets/images/launcher/icon_adaptive_background.png"
   adaptive_icon_foreground: "assets/images/launcher/icon_adaptive_foreground.png"
+
+flutter_native_splash:
+  image: "assets/images/splash.png"
+  color: "d9d9d9"
