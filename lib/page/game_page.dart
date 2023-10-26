@@ -35,6 +35,7 @@ class _GamePageState extends ConsumerState<GamePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(buttonsListProvider.notifier).initializeGame();
       ref.read(countProvider.notifier).resetCount();
+      ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
     });
   }
 

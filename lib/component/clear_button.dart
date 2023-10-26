@@ -35,36 +35,6 @@ class ClearButton extends StatelessWidget {
           ),
         ),
       ),
-
-      // child: Container(
-      //   width: double.infinity,
-      //   padding: const EdgeInsets.all(16),
-      //   decoration: BoxDecoration(
-      //     color: color,
-      //     borderRadius: BorderRadius.circular(4),
-      //     border: Border.all(
-      //         color: isButtonPressed
-      //             ? Colors.grey.shade200
-      //             : Colors.grey.shade300),
-      //     boxShadow: isButtonPressed
-      //         ? [
-      //             // 押下時は影なし
-      //           ]
-      //         : [
-      //             BoxShadow(
-      //               color: Colors.grey.shade400,
-      //               offset: const Offset(1, 1),
-      //               blurRadius: 1,
-      //               spreadRadius: 1,
-      //             ),
-      //             const BoxShadow(
-      //               color: Colors.white,
-      //               offset: Offset(-1, -1),
-      //               blurRadius: 1,
-      //               spreadRadius: 1,
-      //             ),
-      //           ],
-      //   ),
     );
   }
 }

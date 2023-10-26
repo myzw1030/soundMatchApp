@@ -16,6 +16,8 @@ class NextButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(300, 50),
+        padding: const EdgeInsets.all(16),
+        backgroundColor: Colors.blue.shade400,
       ),
       child: Text(
         text,

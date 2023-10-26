@@ -97,7 +97,7 @@ class _ClearDialogState extends ConsumerState<ClearDialog> {
                   '$pressedCount',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 34,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -105,7 +105,7 @@ class _ClearDialogState extends ConsumerState<ClearDialog> {
                   '回でクリア！',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -117,6 +117,7 @@ class _ClearDialogState extends ConsumerState<ClearDialog> {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 30),
@@ -142,6 +143,8 @@ class _ClearDialogState extends ConsumerState<ClearDialog> {
               color: Colors.red.shade400,
               text: 'ゲームをやめる',
               onTap: () {
+                ref.read(buttonsListProvider.notifier).initializeGame();
+                ref.read(countProvider.notifier).resetCount();
                 context.go('/');
               },
             ),

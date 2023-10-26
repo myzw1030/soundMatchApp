@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sound_match_app/component/clear_dialog.dart';
 import 'package:sound_match_app/models/sound_list.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 
 // 音声一致かどうか
 final matchingProvider =
@@ -101,7 +102,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
     final secondSound = ref.read(secondPressedSoundProvider.notifier).state;
 
     if (firstSound == null) {
-      print('1つめが押された');
+      // print('1つめが押された');
       ref.read(firstPressedSoundProvider.notifier).state = widget.soundFilePath;
       // 最初にタップされたSoundButtonの状態をfirstPressedButtonProviderに保存
       ref.read(firstButtonStateProvider.notifier).state = this;
@@ -110,7 +111,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         isButtonPressed = true;
       });
     } else if (secondSound == null) {
-      print('2つめが押された');
+      // print('2つめが押された');
       ref.read(secondPressedSoundProvider.notifier).state =
           widget.soundFilePath;
       // 2つ目にタップされたSoundButtonの状態をsecondPressedButtonProviderに保存
@@ -125,7 +126,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       final secondButton = ref.read(secondButtonStateProvider.notifier).state;
 
       if (firstSound == widget.soundFilePath) {
-        print('一致');
+        // print('一致');
         // 「正解」のテキスト用
         ref.read(matchingProvider.notifier).state = MatchingStatus.correct;
         // ♪ボタン無効化
@@ -144,12 +145,12 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         // print('currentMatchedSounds:$currentMatchedSounds');
         // print(deepEq(currentMatchedSounds, soundsLists));
         if (deepEq(currentMatchedSounds, soundsLists)) {
-          print('全てクリア');
+          // print('全てクリア');
           ref.read(matchingProvider.notifier).state = MatchingStatus.clear;
           // timer?.cancel();
 
           // クリアしたらモーダル表示
-          showDialog(
+          showAnimatedDialog(
             context: context,
             builder: (_) {
               return WillPopScope(
@@ -157,6 +158,10 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
                 onWillPop: () async => false,
               );
             },
+            animationType: DialogTransitionType.scale,
+            duration: const Duration(
+              milliseconds: 500,
+            ),
           );
         } else {
           // 時間差でテキストを初期に戻す
@@ -165,7 +170,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
           });
         }
       } else {
-        print('不一致');
+        // print('不一致');
         // 「不正解」のテキスト用
         ref.read(matchingProvider.notifier).state = MatchingStatus.incorrect;
 
