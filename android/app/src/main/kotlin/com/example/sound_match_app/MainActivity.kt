@@ -1,4 +1,4 @@
-package com.miyazawa.soundMatch
+package com.gmail.13tmtmtommy.soundMatch
 
 import io.flutter.embedding.android.FlutterActivity
 
