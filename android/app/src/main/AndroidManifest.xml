@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gmail.13tmtmtommy.soundMatch">
+    package="com.miyazawa.soundMatch">
    <application
         android:label="オトマッチェ"
         android:name="${applicationName}"
