@@ -1,16 +1,14 @@
-# sound_match_app
+# アプリ名
+オトマッチェ
 
-A new Flutter project.
+## バージョン管理
+- fvmを使用してFlutterのバージョン管理を行っています。
+  - Flutter 3.13.6(2023.10.28時点)
 
-## Getting Started
+## 内容概要
+音をそろえる神経衰弱アプリです。
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| ホーム画面                       | ゲーム画面                       | クリア画面                       |
+| :---: | :---: | :---: |
+| ![ホーム画面 ](screenshots/01.png) | ![ゲーム画面 ](screenshots/02.png) | ![クリア画面 ](screenshots/03.png) |
