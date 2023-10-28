@@ -9,6 +9,6 @@
 音をそろえる神経衰弱アプリです。
 
 
-<!-- | ホーム画面                       | ゲーム画面                       | クリア画面                       |
+| ホーム画面                       | ゲーム画面                       | クリア画面                       |
 | :---: | :---: | :---: |
-| ![ホーム画面 ](screenshots/01.png) | ![ゲーム画面 ](screenshots/02.png) | ![クリア画面 ](screenshots/03.png) | -->
+| ![ホーム画面 ](screenshots/01.png) | ![ゲーム画面 ](screenshots/02.png) | ![クリア画面 ](screenshots/03.png) |
