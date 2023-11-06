@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sound_match_app/component/clear_button.dart';
-import 'package:sound_match_app/component/sound_button.dart';
 import 'package:sound_match_app/models/sound_list.dart';
 import 'package:sound_match_app/page/game_page.dart';
 

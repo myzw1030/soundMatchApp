@@ -4,28 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sound_match_app/component/clear_dialog.dart';
+import 'package:sound_match_app/models/sound_control.dart';
 import 'package:sound_match_app/models/sound_list.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 
-// 音声一致かどうか
-final matchingProvider =
-    StateProvider<MatchingStatus>((ref) => MatchingStatus.initial);
-
-enum MatchingStatus {
-  initial, // 初期値
-  correct, // 正解
-  incorrect, // 不正解
-  clear, // ゲームクリア
-}
-
-// 効果音を格納
-final matchedSoundsProvider = StateProvider<List<String>>((ref) => []);
-
+// ボタンの状態を管理
 final firstPressedSoundProvider = StateProvider<String?>((ref) => null);
 final secondPressedSoundProvider = StateProvider<String?>((ref) => null);
 
 // SoundButton
+/* TODO 別ディレクトリに分ける */
 final firstButtonStateProvider =
     StateProvider<_SoundButtonState?>((ref) => null);
 final secondButtonStateProvider =
@@ -128,16 +117,17 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
       if (firstSound == widget.soundFilePath) {
         // print('一致');
         // 「正解」のテキスト用
-        ref.read(matchingProvider.notifier).state = MatchingStatus.correct;
+        ref.read(soundMatchingProvider.notifier).state = MatchingStatus.correct;
         // ♪ボタン無効化
         firstButton?.changeAbsorbing();
         secondButton?.changeAbsorbing();
 
         // 一致した効果音は配列へ格納
         final currentMatchedSounds =
-            ref.read(matchedSoundsProvider.notifier).state;
+            ref.read(matchedSoundsStoreProvider.notifier).state;
         currentMatchedSounds.add(widget.soundFilePath);
-        ref.read(matchedSoundsProvider.notifier).state = currentMatchedSounds;
+        ref.read(matchedSoundsStoreProvider.notifier).state =
+            currentMatchedSounds;
 
         // 格納された配列と元々のsoundsListsを比較
         final soundsLists = ref.read(soundsListsProvider).soundLists;
@@ -146,7 +136,7 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         // print(deepEq(currentMatchedSounds, soundsLists));
         if (deepEq(currentMatchedSounds, soundsLists)) {
           // print('全てクリア');
-          ref.read(matchingProvider.notifier).state = MatchingStatus.clear;
+          ref.read(soundMatchingProvider.notifier).state = MatchingStatus.clear;
           // timer?.cancel();
 
           // クリアしたらモーダル表示
@@ -166,20 +156,23 @@ class _SoundButtonState extends ConsumerState<SoundButton> {
         } else {
           // 時間差でテキストを初期に戻す
           Timer(const Duration(seconds: 1), () {
-            ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
+            ref.read(soundMatchingProvider.notifier).state =
+                MatchingStatus.initial;
           });
         }
       } else {
         // print('不一致');
         // 「不正解」のテキスト用
-        ref.read(matchingProvider.notifier).state = MatchingStatus.incorrect;
+        ref.read(soundMatchingProvider.notifier).state =
+            MatchingStatus.incorrect;
 
         // ボタンの状態をリセット
         firstButton?.resetButton();
         secondButton?.resetButton();
         // 時間差でテキストを初期に戻す
         Timer(const Duration(seconds: 1), () {
-          ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
+          ref.read(soundMatchingProvider.notifier).state =
+              MatchingStatus.initial;
         });
       }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sound_match_app/component/sound_button.dart';
+import 'package:sound_match_app/models/sound_control.dart';
 import 'package:sound_match_app/models/sound_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,21 +11,6 @@ class GamePage extends ConsumerStatefulWidget {
 }
 
 class _GamePageState extends ConsumerState<GamePage> {
-  // 押下したボタンに応じてテキスト変更
-  String matchingText(MatchingStatus status) {
-    switch (status) {
-      case MatchingStatus.correct:
-        return '正解♪';
-      case MatchingStatus.incorrect:
-        return '不正解♪';
-      case MatchingStatus.clear:
-        return 'ゲームクリア♪';
-      case MatchingStatus.initial:
-      default:
-        return '同じ♪を見つけよう！';
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -35,13 +20,13 @@ class _GamePageState extends ConsumerState<GamePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(buttonsListProvider.notifier).initializeGame();
       ref.read(countProvider.notifier).resetCount();
-      ref.read(matchingProvider.notifier).state = MatchingStatus.initial;
+      ref.read(soundMatchingProvider.notifier).state = MatchingStatus.initial;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isMatching = ref.watch(matchingProvider);
+    final isMatching = ref.watch(soundMatchingProvider);
     final pressedCount = ref.watch(countProvider);
     final buttonsList = ref.watch(buttonsListProvider);
     return WillPopScope(
