@@ -9,10 +9,6 @@ import 'package:sound_match_app/models/sound_list.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 
-// ボタンの状態を管理
-final firstPressedSoundProvider = StateProvider<String?>((ref) => null);
-final secondPressedSoundProvider = StateProvider<String?>((ref) => null);
-
 // SoundButton
 /* TODO 別ディレクトリに分ける */
 final firstButtonStateProvider =
